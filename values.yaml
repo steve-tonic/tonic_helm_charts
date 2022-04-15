@@ -1,0 +1,88 @@
+# tonicdb is the postgres database that will hold information about your workspace.
+tonicdb:
+  host: <db-host>
+  port: 5432
+  dbName: tonic
+  user: <user>
+  password: <password>
+  sslMode: Require
+
+environmentName: <company-name>
+
+# tonicStatisticsSeed will cause generations to be consisent with each other for anything where consistency is set to true.
+# otherwise each generation will be internally consistent, but not consistent with other generations.
+tonicStatisticsSeed: <any-integer>
+
+# numberOfWorkers will determine how many worker containers are deployed when installing the helm chart.
+numberOfWorkers: 1
+
+# enableLogCollection will send errors and general information about generations to Tonic if true. It will not send user data.
+enableLogCollection: false
+
+# This value will be provided to you by Tonic and will allow you to authenticate against our private docker repository.
+dockerConfigAuth: <docker-config-auth>
+
+# Service account for tonic
+serviceAccount:
+  create: true
+  annotations: {}
+
+# You can set this to a specific Tonic version number if you wish to ensure you always get the same version. Otherwise you will always deploy the latest version of Tonic.
+tonicVersion: latest
+
+# Container repository with tonic images. If you don't use the default one you will have to copy images over before deployment
+tonicai:
+  web_server:
+    image: quay.io/tonicai/tonic_web_server
+    # Comma separated list of user emails that should be have the Admin role in Tonic.
+    administrators: example@email.com,other@email.com
+    annotations:
+      # This annotation is only required if you are creating an internal facing ELB. Remove this annotation to create public facing ELB.
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    features:
+      # Enables/Disables the HostIntegrations endpoint
+      host_integration_enabled: "true" 
+      kubernetes_role: "default"
+  worker:
+    image: quay.io/tonicai/tonic_worker
+    env: {}
+    envRaw: {}
+  notifications:
+    image: quay.io/tonicai/tonic_notifications
+  pii_detection:
+    image: quay.io/tonicai/tonic_pii_detection
+  pyml_service:
+    image: quay.io/tonicai/tonic_pyml_service
+# Uncomment for Oracle Support. Valid versions are "19", "12_2", and "11_2".
+# oracle_helper:
+#   image: quay.io/tonicai/tonic_oracle_helper
+#   version: "19"
+#   lang: "AMERICAN_AMERICA.AL32UTF8"
+
+# Use a Tonic license to enable different features. License keys can be obtained from Tonic.
+tonicLicense: <license-key>
+
+# Enterprise License Only: Below are the settings for Single Sign On. Not every provider requires every value. The Tonic support team will help you configure this.
+# tonicSsoConfig:
+#   provider: <provider-name>
+#   domain: <sso-domain>
+#   clientId: <client-id>
+#   clientSecret: <client-secret>
+#   identityProviderId: <identity-provider-id>
+#   authServerId: <auth-server-id>
+#   groupFilter: .*Tonic.*
+#   samlIdpMetadata: <AWS SSO SAML metadata XML>
+
+# Enterprise License Only: Configuration options for tonic-notifications.
+# tonicSmtpConfig:
+#   tonicUrl: <tonic URL, for links>
+#   sendingAddress: <notifications@yourdomain.com>
+#   smtpServerAddress: <smtp host>
+#   smtpServerPort: <smtp port>
+#   smtpUsername: <smtp username>
+#   smtpPassword: <smtp password>
+
+
+# Role used by Tonic to connect to AWS Lambda. This is needed for Snowflake and Redshift integrations.
+# awsLambdaRoleArn: arn:aws:iam::<accountId>:role/<role-name>
